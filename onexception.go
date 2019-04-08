@@ -3,11 +3,12 @@ package main
 
 import (
 	"MyWeb/errors"
+	"MyWeb/models"
 	"fmt"
 	"github.com/kataras/iris"
+	"github.com/kataras/iris/context"
 	"runtime"
 	"strconv"
-	"github.com/kataras/iris/context"
 )
 
 func getRequestLogs(ctx context.Context) string {
@@ -49,13 +50,15 @@ func OnException() context.Handler {
 				logMessage += fmt.Sprintf("\n%s", stacktrace)
 				ctx.Application().Logger().Warn(logMessage)
 
-				if e,ok :=err.(errors.ValidationError); ok{
+				if e, ok := err.(errors.ValidationError); ok {
 					ctx.StatusCode(iris.StatusBadRequest)
 					ctx.JSON(e)
 					ctx.StopExecution()
+					return
 				}
 
 				ctx.StatusCode(500)
+				ctx.JSON(models.CreateResponse(900, fmt.Sprintf("%s", err)))
 				ctx.StopExecution()
 			}
 		}()

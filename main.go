@@ -3,11 +3,11 @@ package main
 import (
 	"MyWeb/controllers"
 	"MyWeb/models"
+	"MyWeb/services"
 	"github.com/kataras/iris"
 	"github.com/kataras/iris/middleware/logger"
 	"github.com/kataras/iris/mvc"
 )
-
 
 func main() {
 	app := iris.New()
@@ -34,20 +34,29 @@ func main() {
 	app.Use(requestLogger)
 
 	app.OnErrorCode(iris.StatusNotFound, notFound)
-	app.OnErrorCode(iris.StatusInternalServerError, internalServerError)
+
 	mvc.Configure(app.Party("/api"), func(app *mvc.Application) {
+		app.Register(&services.TestService{})
+
+		app.Register(func(ctx iris.Context) (request models.AuthorizePlayerRequest) {
+			ctx.ReadJSON(&request)
+			services.Validate(request)
+			return
+		})
+		app.Register(func(ctx iris.Context) (request models.ClientCredentialsTokenRequest) {
+			ctx.ReadForm(&request)
+			services.Validate(request)
+			return
+		})
 		app.Handle(&controllers.PlayerController{})
+		app.Handle(&controllers.OAuthController{})
 	})
 
-	app.Run(iris.Addr(":8080"),configure)
+	app.Run(iris.Addr(":8080"), configure)
 }
 
 func notFound(ctx iris.Context) {
-	ctx.JSON(models.CreateResponse(404,"Page not found"))
-}
-
-func internalServerError(ctx iris.Context) {
-	ctx.JSON(models.CreateResponse(900,"error occurs"))
+	ctx.JSON(models.CreateResponse(404, "Page not found"))
 }
 
 func configure(app *iris.Application) {
