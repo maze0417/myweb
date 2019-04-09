@@ -37,7 +37,6 @@ func main() {
 
 	mvc.Configure(app.Party("/api"), func(app *mvc.Application) {
 		app.Register(
-			//&services.Test2Service{},
 			&services.TestService{},
 			func(ctx iris.Context) (request models.AuthorizePlayerRequest) {
 				ctx.ReadJSON(&request)
@@ -49,8 +48,8 @@ func main() {
 				services.Validate(request)
 				return
 			},
-			)
-		app.Handle(controllers.NewPlayerController())
+		)
+		app.Handle(&controllers.PlayerController{})
 		app.Handle(&controllers.OAuthController{})
 	})
 
