@@ -21,9 +21,6 @@ func getRequestLogs(ctx context.Context) string {
 	return fmt.Sprintf("%v %s %s %s", status, path, method, ip)
 }
 
-// New returns a new recover middleware,
-// it recovers from panics and logs
-// the panic message to the application's logger "Warn" level.
 func OnException() context.Handler {
 	return func(ctx context.Context) {
 		defer func() {
