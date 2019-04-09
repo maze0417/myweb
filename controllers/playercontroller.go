@@ -8,6 +8,12 @@ import (
 
 type PlayerController struct{}
 
+var _helloService services.ITestService
+func NewPlayerController(helloService services.ITestService) *PlayerController {
+	_helloService=helloService
+	return &PlayerController{}
+}
+
 func (m *PlayerController) BeforeActivation(b mvc.BeforeActivation) {
 	//dep:=b.Dependencies()
 	//dep.Add(func(ctx iris.Context) (request models.AuthorizePlayerRequest) {
@@ -19,10 +25,10 @@ func (m *PlayerController) BeforeActivation(b mvc.BeforeActivation) {
 	b.Handle("POST", "/player/authorize", "Authorize")
 }
 
-func (m *PlayerController) Authorize(request models.AuthorizePlayerRequest, heloservice services.ITestService) models.AuthorizePlayerResponse {
+func (m *PlayerController) Authorize(request models.AuthorizePlayerRequest) models.AuthorizePlayerResponse {
 
 	return models.AuthorizePlayerResponse{
 		Err:     0,
-		Errdesc: heloservice.MyTest(request.Userid),
+		Errdesc: _helloService.MyTest(request.Userid),
 	}
 }

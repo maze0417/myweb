@@ -36,19 +36,21 @@ func main() {
 	app.OnErrorCode(iris.StatusNotFound, notFound)
 
 	mvc.Configure(app.Party("/api"), func(app *mvc.Application) {
-		app.Register(&services.TestService{})
-
-		app.Register(func(ctx iris.Context) (request models.AuthorizePlayerRequest) {
-			ctx.ReadJSON(&request)
-			services.Validate(request)
-			return
-		})
-		app.Register(func(ctx iris.Context) (request models.ClientCredentialsTokenRequest) {
-			ctx.ReadForm(&request)
-			services.Validate(request)
-			return
-		})
-		app.Handle(&controllers.PlayerController{})
+		app.Register(
+			//&services.Test2Service{},
+			&services.TestService{},
+			func(ctx iris.Context) (request models.AuthorizePlayerRequest) {
+				ctx.ReadJSON(&request)
+				services.Validate(request)
+				return
+			},
+			func(ctx iris.Context) (request models.ClientCredentialsTokenRequest) {
+				ctx.ReadForm(&request)
+				services.Validate(request)
+				return
+			},
+			)
+		app.Handle(controllers.NewPlayerController())
 		app.Handle(&controllers.OAuthController{})
 	})
 
